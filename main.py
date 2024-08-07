@@ -6,9 +6,16 @@ import multiprocessing
 
 from ui import update_display
 
-TIME_TO_ANSWER = 10
+TIME_TO_ANSWER = 5
+REBOUND = True
+TEAM_1_NAME = "TEAM A"
+TEAM_2_NAME = "TEAM B"
 
-buzzer_controller = pybuzzers.get_all_buzzers()[0]
+try:
+    buzzer_controller = pybuzzers.get_all_buzzers()[0]
+except:
+    print("Could not find controllers, ensure they are connected")
+    exit()
 
 buzzer_controller.set_lights([False, False, False, False])
 
@@ -31,8 +38,8 @@ countdown_active_mutex = threading.Lock()
 first_buzzer_time_player = [0, -1]
 second_buzzer_time_player = [0, -1]
 
-team_names = ["Papi", "Mami"]
-team_colors = [(0, 0, 255), (255, 0, 0)]
+team_names = [TEAM_1_NAME, TEAM_2_NAME]
+team_colors = [(0, 120, 255), (255, 255, 0)]
 
 def respond_to_press(buzzer_set: pybuzzers.BuzzerSet, buzzer: int, button: int, queue):
     global countdown_active
@@ -46,7 +53,7 @@ def respond_to_press(buzzer_set: pybuzzers.BuzzerSet, buzzer: int, button: int, 
         first_buzzer_time_player = [time.time(), buzzer]
         with countdown_active_mutex:
             countdown_active = True
-        thread_turns = threading.Thread(target=handle_answer, args=(buzzer, False, queue))
+        thread_turns = threading.Thread(target=handle_answer, args=(buzzer, REBOUND, queue))
         thread_turns.start()
     elif buzzer in [0, 1] and button == 0 and countdown_active:
         if second_buzzer_time_player[1] == -1 and buzzer != first_buzzer_time_player[1]:
@@ -73,6 +80,7 @@ def handle_answer(buzzer: int, with_rebound: bool, queue):
     for current_buzzer in buzzers:
         if countdown_light(current_buzzer, queue):
             break
+        queue.put("")
 
     reset_lights()
 
@@ -106,20 +114,20 @@ def countdown_light(buzzer, queue):
                 correct.play()
                 buzzer_controller.set_light(buzzer, True)
                 time.sleep(1)
-                buzzer_controller.set_light(buzzer, False)
-                queue.put("Correct")
-                time.sleep(2)
+                queue.put(("Correct", (0,255,0)))
                 queue.put("")
+                time.sleep(2)
+                buzzer_controller.set_light(buzzer, False)
                 return True
 
             if wrong_answer:
                 time.sleep(0.5)
                 error.play()
-                queue.put("Incorrect")
-                buzzer_controller.set_light(buzzer, True)
-                time.sleep(1)
-                buzzer_controller.set_light(buzzer, False)
+                queue.put(("Incorrect", (255,0,0)))
                 queue.put("")
+                buzzer_controller.set_light(buzzer, True)
+                time.sleep(1.5)
+                buzzer_controller.set_light(buzzer, False)
                 return False
 
         elapsed_time = time.time() - actual_seconds
@@ -148,6 +156,7 @@ def main():
         while True:
             time.sleep(0.1)
     except KeyboardInterrupt:
+        reset_lights()
         ui_process.terminate()
         ui_process.join()
 
