@@ -3,7 +3,6 @@ import multiprocessing
 
 def update_display(queue):
     pygame.init()
-    print(pygame.font.get_fonts())
     largest_size = pygame.display.list_modes()[0]
     screen = pygame.display.set_mode(largest_size, pygame.FULLSCREEN)  # Set the display mode to fullscreen
     big_font = pygame.font.Font("data/fonts/SuperMario256.ttf", 104)

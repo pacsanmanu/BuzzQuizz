@@ -6,7 +6,7 @@ import multiprocessing
 
 from ui import update_display
 
-TIME_TO_ANSWER = 5
+TIME_TO_ANSWER = 8
 REBOUND = True
 TEAM_1_NAME = "TEAM A"
 TEAM_2_NAME = "TEAM B"
@@ -25,9 +25,9 @@ beep_sound = pygame.mixer.Sound('data/sounds/beep.mp3')
 error = pygame.mixer.Sound('data/sounds/error.mp3')
 correct = pygame.mixer.Sound('data/sounds/correct.mp3')
 clown = pygame.mixer.Sound('data/sounds/clown.mp3')
-bonk = pygame.mixer.Sound('data/sounds/bonk.mp3')
+horn = pygame.mixer.Sound('data/sounds/horn.mp3')
 
-buzz_sounds = [clown, bonk]
+buzz_sounds = [clown, horn]
 
 correct_answer = False
 answer_mutex = threading.Lock()
@@ -110,23 +110,22 @@ def countdown_light(buzzer, queue):
     while time.time() - actual_seconds < TIME_TO_ANSWER:
         with answer_mutex:
             if correct_answer:
-                print("Correct answer")
                 correct.play()
-                buzzer_controller.set_light(buzzer, True)
-                time.sleep(1)
                 queue.put(("Correct", (0,255,0)))
                 queue.put("")
-                time.sleep(2)
+                buzzer_controller.set_light(buzzer, True)
+                while pygame.mixer.get_busy():
+                    pass
                 buzzer_controller.set_light(buzzer, False)
                 return True
 
             if wrong_answer:
-                time.sleep(0.5)
                 error.play()
                 queue.put(("Incorrect", (255,0,0)))
                 queue.put("")
                 buzzer_controller.set_light(buzzer, True)
-                time.sleep(1.5)
+                while pygame.mixer.get_busy():
+                    pass
                 buzzer_controller.set_light(buzzer, False)
                 return False
 
