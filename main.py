@@ -73,12 +73,13 @@ def reset_lights():
     buzzer_controller.set_lights([False, False, False, False])
 
 def handle_answer(buzzer: int, with_rebound: bool, queue):
+    global second_buzzer_time_player
     reset_lights()
 
     buzzers = [buzzer] if not with_rebound else [buzzer, 1 - buzzer]
 
     for current_buzzer in buzzers:
-        if countdown_light(current_buzzer, queue):
+        if countdown_light(current_buzzer, queue) or second_buzzer_time_player[1] == -1: 
             break
 
     reset_lights()
@@ -88,7 +89,6 @@ def handle_answer(buzzer: int, with_rebound: bool, queue):
         countdown_active = False
 
     global first_buzzer_time_player
-    global second_buzzer_time_player
 
     first_buzzer_time_player = [0, -1]
     second_buzzer_time_player = [0, -1]
