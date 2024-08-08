@@ -4,7 +4,8 @@ import multiprocessing
 def update_display(queue):
     pygame.init()
     largest_size = pygame.display.list_modes()[0]
-    screen = pygame.display.set_mode(largest_size, pygame.FULLSCREEN)  # Set the display mode to fullscreen
+    # screen = pygame.display.set_mode(largest_size, pygame.FULLSCREEN)  # Set the display mode to fullscreen
+    screen = pygame.display.set_mode((1080, 720), pygame.RESIZABLE)
     big_font = pygame.font.Font("data/fonts/SuperMario256.ttf", 104)
     small_font = pygame.font.Font("data/fonts/SuperMario256.ttf", 54)
     team_text = ""
@@ -46,7 +47,7 @@ def update_display(queue):
             time_text_rect = rendered_time_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2 + 100))
             screen.blit(rendered_time_text, time_text_rect)
         if not team_text and not time_text:
-            rendered_text = big_font.render("Ready", True, (255,255,255))
+            rendered_text = big_font.render("Listos", True, (255,255,255))
             text_rect = rendered_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
             screen.blit(rendered_text, text_rect)
 

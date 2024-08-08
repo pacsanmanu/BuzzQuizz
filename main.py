@@ -8,8 +8,8 @@ from ui import update_display
 
 TIME_TO_ANSWER = 8
 REBOUND = True
-TEAM_1_NAME = "TEAM A"
-TEAM_2_NAME = "TEAM B"
+TEAM_1_NAME = "TIGRES"
+TEAM_2_NAME = "LEONES"
 
 try:
     buzzer_controller = pybuzzers.get_all_buzzers()[0]
@@ -26,6 +26,7 @@ error = pygame.mixer.Sound('data/sounds/error.mp3')
 correct = pygame.mixer.Sound('data/sounds/correct.mp3')
 clown = pygame.mixer.Sound('data/sounds/clown.mp3')
 horn = pygame.mixer.Sound('data/sounds/horn.mp3')
+timesup = pygame.mixer.Sound('data/sounds/timesup.mp3')
 
 buzz_sounds = [clown, horn]
 
@@ -59,7 +60,7 @@ def respond_to_press(buzzer_set: pybuzzers.BuzzerSet, buzzer: int, button: int, 
         if second_buzzer_time_player[1] == -1 and buzzer != first_buzzer_time_player[1]:
             second_buzzer_time_player = [time.time(), buzzer]
             time_diff = second_buzzer_time_player[0] - first_buzzer_time_player[0]
-            queue.put(f"+{time_diff:.3f} seconds")
+            queue.put(f"+{time_diff:.3f} segundos")
     elif buzzer in [2, 3] and button == 0 and countdown_active:
         with answer_mutex:
             if countdown_active:
@@ -110,7 +111,7 @@ def countdown_light(buzzer, queue):
         with answer_mutex:
             if correct_answer:
                 correct.play()
-                queue.put(("Correct", (0,255,0)))
+                queue.put(("Correcto", (0,255,0)))
                 queue.put("")
                 buzzer_controller.set_light(buzzer, True)
                 while pygame.mixer.get_busy():
@@ -120,7 +121,7 @@ def countdown_light(buzzer, queue):
 
             if wrong_answer:
                 error.play()
-                queue.put(("Incorrect", (255,0,0)))
+                queue.put(("Incorrecto", (255,0,0)))
                 queue.put("")
                 buzzer_controller.set_light(buzzer, True)
                 while pygame.mixer.get_busy():
@@ -139,8 +140,8 @@ def countdown_light(buzzer, queue):
         buzzer_controller.set_light(buzzer, False)
         time.sleep(off_time)    
 
-    error.play()
-    queue.put(("Tiempo!", (255,0,0)))
+    timesup.play()
+    queue.put(("Tiempo!", (255,155,0)))
     queue.put("")
     buzzer_controller.set_light(buzzer, True)
     while pygame.mixer.get_busy():
