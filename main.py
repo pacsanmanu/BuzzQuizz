@@ -142,8 +142,10 @@ def countdown_light(buzzer, queue):
     error.play()
     queue.put(("Tiempo!", (255,0,0)))
     queue.put("")
+    buzzer_controller.set_light(buzzer, True)
     while pygame.mixer.get_busy():
         pass
+    buzzer_controller.set_light(buzzer, False)
     return False
 
 def main():
