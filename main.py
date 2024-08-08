@@ -80,7 +80,6 @@ def handle_answer(buzzer: int, with_rebound: bool, queue):
     for current_buzzer in buzzers:
         if countdown_light(current_buzzer, queue):
             break
-        queue.put("")
 
     reset_lights()
 
@@ -138,9 +137,13 @@ def countdown_light(buzzer, queue):
         beep_sound.play()
         time.sleep(on_time)
         buzzer_controller.set_light(buzzer, False)
-        time.sleep(off_time)
-    
+        time.sleep(off_time)    
+
     error.play()
+    queue.put(("Tiempo!", (255,0,0)))
+    queue.put("")
+    while pygame.mixer.get_busy():
+        pass
     return False
 
 def main():
