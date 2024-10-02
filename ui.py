@@ -1,7 +1,7 @@
 import pygame
 import multiprocessing
 
-def update_display(queue):
+def update_display(queue, event_queue):
     pygame.init()
     largest_size = pygame.display.list_modes()[0]
     # screen = pygame.display.set_mode(largest_size, pygame.FULLSCREEN)  # Set the display mode to fullscreen
@@ -25,6 +25,10 @@ def update_display(queue):
                 elif event.key == pygame.K_F11 and not fullscreen:
                     screen = pygame.display.set_mode(largest_size, pygame.FULLSCREEN)
                     fullscreen = True
+                elif event.key == pygame.K_SPACE:
+                    event_queue.put('space')
+                elif event.key == pygame.K_RETURN:
+                    event_queue.put('enter')
 
         try:
             message = queue.get_nowait()
@@ -56,4 +60,5 @@ def update_display(queue):
 
 if __name__ == '__main__':
     queue = multiprocessing.Queue()
-    update_display(queue)
+    event_queue = multiprocessing.Queue()
+    update_display(queue, event_queue)
